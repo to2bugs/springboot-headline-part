@@ -21,4 +21,19 @@
         hid,title,article,type,publisher,page_views,
         create_time,update_time,version,is_deleted
     </sql>
+
+    <select id="selectMyPage" resultType="java.util.Map">
+        select
+            hid, title, type, page_views pageViews, timestampdiff(HOUR, create_time, NOW()) pastHours, publisher
+        from news_headline
+        <where>
+            is_deleted = 0
+            <if test="portalNewsVo.keyWords != null and portalNewsVo.keyWords!= ''">
+                and title like concat('%', #{portalNewsVo.keyWords}, '%')
+            </if>
+            <if test="portalNewsVo.type != null and portalNewsVo.type != 0">
+                and type = #{portalNewsVo.type}
+            </if>
+        </where>
+    </select>
 </mapper>

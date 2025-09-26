@@ -2,6 +2,10 @@ package com.otto.service;
 
 import com.otto.pojo.Headline;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.otto.pojo.vo.req.PortalNewsVo;
+import com.otto.utils.Result;
+
+import java.util.Map;
 
 /**
 * @author to2bagezero
@@ -10,4 +14,10 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface HeadlineService extends IService<Headline> {
 
+    /**
+     * 分页查询首页头条信息
+     * @param portalNewsVo
+     * @return
+     */
+    Result<Map<String, Object>> findNewsPage(PortalNewsVo portalNewsVo);
 }

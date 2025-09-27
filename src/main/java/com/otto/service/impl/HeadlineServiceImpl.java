@@ -1,5 +1,8 @@
 package com.otto.service.impl;
+import java.util.Date;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -10,6 +13,7 @@ import com.otto.mapper.HeadlineMapper;
 import com.otto.utils.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
@@ -66,6 +70,36 @@ public class HeadlineServiceImpl extends ServiceImpl<HeadlineMapper, Headline>
         dataMap.put("totalSize", totalSize); // 总的数据的条数
 
         return Result.ok(dataMap);
+    }
+
+    /**
+     * 查询头条详情
+     * 1. 先查询数据
+     * 2. 再修改阅读量+1
+     * @param hid
+     * @return
+     */
+    // @Transactional(rollbackFor = Exception.class)
+    @Override
+    public Result<Map<String, Object>> showHeadlineDetail(Integer hid) {
+        // 查询数据
+        Map<String, Object> headline = headlineMapper.selectHeadlineDetail(hid);
+        Map<String, Object> data = new HashMap<>();
+        data.put("headline", headline);
+
+        // 修改阅读量+1
+        Headline newHeadline = new Headline();
+        newHeadline.setHid((Integer) headline.get("hid"));
+        newHeadline.setPageViews((Integer) headline.get("pageViews") + 1);
+        newHeadline.setVersion((Integer) headline.get("version"));
+
+        LambdaQueryWrapper<Headline> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Headline::getHid, hid);
+        headlineMapper.update(newHeadline, wrapper);
+        // 上面三行可以简化成: headlineMapper.updateById(newHeadline);
+
+        // 返回
+        return Result.ok(data);
     }
 }
 

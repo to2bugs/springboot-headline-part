@@ -27,6 +27,14 @@ public interface HeadlineMapper extends BaseMapper<Headline> {
     IPage<Map<String, Object>> selectMyPage(
             IPage<Map<String, Object>> page,
             @Param("portalNewsVo") PortalNewsVo portalNewsVo);
+
+
+    /**
+     * 查询头条详情
+     * @param hid
+     * @return
+     */
+    Map<String, Object> selectHeadlineDetail(@Param("hid") Integer hid);
 }
 
 

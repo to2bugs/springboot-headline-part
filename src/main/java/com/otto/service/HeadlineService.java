@@ -20,4 +20,6 @@ public interface HeadlineService extends IService<Headline> {
      * @return
      */
     Result<Map<String, Object>> findNewsPage(PortalNewsVo portalNewsVo);
+
+    Result<Map<String, Object>> showHeadlineDetail(Integer hid);
 }

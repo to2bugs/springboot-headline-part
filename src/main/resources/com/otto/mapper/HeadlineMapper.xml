@@ -36,4 +36,15 @@
             </if>
         </where>
     </select>
+
+    <select id="selectHeadlineDetail" resultType="java.util.Map">
+        select
+            hid, title, article, type, t.tname typeName, page_views pageViews,
+            TIMESTAMPDIFF(HOUR, create_time, NOW()) pastHours, publisher, u.nick_name author,
+            h.version
+        from news_headline h
+                 left join news_type t on h.type = t.tid
+                 left join news_user u on h.publisher = u.uid
+        where h.hid = #{hid} and h.is_deleted = 0
+    </select>
 </mapper>

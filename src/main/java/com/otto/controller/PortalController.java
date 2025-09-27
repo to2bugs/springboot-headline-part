@@ -45,4 +45,15 @@ public class PortalController {
         Result<Map<String, Object>>  result = headlineService.findNewsPage(portalNewsVo);
         return result;
     }
+
+
+    /**
+     * 查询头条详情
+     */
+    @Operation(summary = "查询头条详情")
+    @PostMapping("/showHeadlineDetail")
+    public Result<Map<String, Object>> showHeadlineDetail(@RequestParam("hid") Integer hid) {
+        Result<Map<String, Object>> result = headlineService.showHeadlineDetail(hid);
+        return result;
+    }
 }

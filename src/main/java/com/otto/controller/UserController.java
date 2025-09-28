@@ -3,7 +3,9 @@ package com.otto.controller;
 import com.otto.pojo.User;
 import com.otto.pojo.vo.req.UserRegisterVo;
 import com.otto.service.UserService;
+import com.otto.utils.JwtHelper;
 import com.otto.utils.Result;
+import com.otto.utils.ResultCodeEnum;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,6 +22,8 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private JwtHelper jwtHelper;
 
     /**
      * 用户登陆
@@ -67,4 +71,19 @@ public class UserController {
         Result result = userService.regist(userRegisterVo);
         return result;
     }
+
+
+    /**
+     * 检查携带的token是否有效
+     */
+    @Operation(summary = "检查携带的token是否有效")
+    @GetMapping("/checkLogin")
+    public Result checkLogin(@RequestHeader("token") String token) {
+        boolean expiration = jwtHelper.isExpiration(token);
+        if (expiration) {
+            return Result.build(null, ResultCodeEnum.NOTLOGIN);
+        }
+        return Result.ok(null);
+    }
+
 }

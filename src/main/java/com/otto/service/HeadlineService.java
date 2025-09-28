@@ -2,7 +2,9 @@ package com.otto.service;
 
 import com.otto.pojo.Headline;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.otto.pojo.vo.req.HeadlinePublishVo;
 import com.otto.pojo.vo.req.PortalNewsVo;
+import com.otto.pojo.vo.resp.HeadlineVo;
 import com.otto.utils.Result;
 
 import java.util.Map;
@@ -22,4 +24,20 @@ public interface HeadlineService extends IService<Headline> {
     Result<Map<String, Object>> findNewsPage(PortalNewsVo portalNewsVo);
 
     Result<Map<String, Object>> showHeadlineDetail(Integer hid);
+
+    /**
+     * 发布头条消息
+     * @param headlinePublishVo
+     * @return
+     */
+    Result publishHeadline(HeadlinePublishVo headlinePublishVo, String token);
+
+
+    /**
+     * 根据id回显头条数据
+     * @return
+     */
+    Result<Map<String, Object>> findHeadlineByHid(Integer hid);
+
+    Result updateHeadline(HeadlineVo headlineVo);
 }

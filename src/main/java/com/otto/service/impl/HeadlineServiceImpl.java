@@ -7,13 +7,20 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.otto.pojo.Headline;
+import com.otto.pojo.vo.req.HeadlinePublishVo;
 import com.otto.pojo.vo.req.PortalNewsVo;
+import com.otto.pojo.vo.resp.HeadlineVo;
 import com.otto.service.HeadlineService;
 import com.otto.mapper.HeadlineMapper;
+import com.otto.utils.JwtHelper;
 import com.otto.utils.Result;
+import io.swagger.v3.oas.annotations.Operation;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +37,8 @@ public class HeadlineServiceImpl extends ServiceImpl<HeadlineMapper, Headline>
 
     @Autowired
     private HeadlineMapper headlineMapper;
+    @Autowired
+    private JwtHelper jwtHelper;
 
     /*
         分页查询首页头条信息
@@ -101,6 +110,71 @@ public class HeadlineServiceImpl extends ServiceImpl<HeadlineMapper, Headline>
         // 返回
         return Result.ok(data);
     }
+
+    /**
+     * 发布头条消息
+     * 1. 补全Headline的数据
+     * @param headlinePublishVo
+     * @return
+     */
+    @Override
+    public Result publishHeadline(HeadlinePublishVo headlinePublishVo, String token) {
+        Long userId = jwtHelper.getUserId(token);
+
+        Headline headline = new Headline();
+        BeanUtils.copyProperties(headlinePublishVo, headline);
+        // 补全Headline的数据
+        headline.setPublisher(userId.intValue());
+        headline.setPageViews(0);
+        headline.setCreateTime(new Date());
+        headline.setUpdateTime(new Date());
+
+        headlineMapper.insert(headline);
+        return Result.ok(null);
+    }
+
+
+    /**
+     * 根据id回显头条数据
+     * @return
+     */
+    @Override
+    public Result<Map<String, Object>> findHeadlineByHid(Integer hid) {
+        LambdaQueryWrapper<Headline> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Headline::getHid, hid);
+
+        Headline headline = headlineMapper.selectOne(wrapper);
+        HeadlineVo headlineVo = new HeadlineVo();
+        BeanUtils.copyProperties(headline, headlineVo);
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("headline", headlineVo);
+        return Result.ok(map);
+    }
+
+
+    /**
+     * 修改头条数据
+     * 1. 根据hid查询数据的最新version，没有最新的version就不能修改
+     * 2. 修改数据的更新时间
+     * @param headlineVo
+     * @return
+     */
+    @Override
+    public Result updateHeadline(HeadlineVo headlineVo) {
+        // 根据hid查询数据的最新version，没有最新的version就不能修改
+        Integer version = headlineMapper.selectById(headlineVo.getHid()).getVersion();
+
+        Headline headline = new Headline();
+        BeanUtils.copyProperties(headlineVo, headline);
+        headline.setUpdateTime(new Date());
+        headline.setVersion(version); // 乐观锁
+
+        headlineMapper.updateById(headline);
+        return Result.ok(null);
+    }
+
+
 }
 
 

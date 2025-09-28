@@ -59,13 +59,16 @@ springdoc:
   # 配置分组信息
   group-configs:
     # 分组名称
-    - group: '用户管理'
+    - group: '用户管理模块'
       # 配置要匹配的路径，注意必须写出/xxx/**
       paths-to-match: '/user/**'
       # controller的完全路径
       packages-to-scan: com.otto.controller
-    - group: '首页管理'
+    - group: '首页管理模块'
       paths-to-match: '/portal/**'
+      packages-to-scan: com.otto.controller
+    - group: '头条管理模块'
+      paths-to-match: '/headline/**'
       packages-to-scan: com.otto.controller
 # knife4j的增强配置，不需要增强可以不配
 knife4j:
